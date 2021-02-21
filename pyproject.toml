@@ -5,6 +5,9 @@ description = "Convierte tiempos"
 authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
 license = "MIT"
 
+[tool.poetry.scripts]
+latimes = 'latimes.__main__:main'
+
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^7.1.2"
