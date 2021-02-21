@@ -11,6 +11,7 @@ latimes = 'latimes.__main__:main'
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^7.1.2"
+pytz = "^2021.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,9 +1,22 @@
 import click
 import re
 from datetime import datetime,timedelta
+from pytz import timezone
+
 
 TIEMPO_REGEX = re.compile("^(?P<dia>[a-zA-Z]+)\s(?P<hora>[0-9]{1,2})\s(?P<ampm>(am|pm|AM|PM))$")
 TODAY = datetime.today() + timedelta(days=-4)
+MEXICO = timezone('America/Mexico_City')
+
+TIMEZONES = {
+    "Colombia": timezone('America/Bogota'),
+    "Chile": timezone('America/Santiago'),
+    "Ecuador": timezone('America/Guayaquil'),
+    "Perú": timezone('America/Lima'),
+    "Argentina": timezone('America/Argentina/Buenos_Aires'),
+    "Guinea Ecuatorial": timezone('Africa/Malabo'),
+
+}
 
 DIAS = {
     dia: valor for valor, dia  in
@@ -27,9 +40,12 @@ def main(cadena_tiempo: str):
 
         hora = int(valores["hora"]) + (0 if valores["ampm"] == "am" else 12)
 
-        valor_final = datetime(fecha_usuario.year, fecha_usuario.month, fecha_usuario.day, hora, 0)
+        valor_final = datetime(fecha_usuario.year, fecha_usuario.month, fecha_usuario.day, hora, 0, tzinfo=MEXICO)
 
-        print(valor_final)
+        print("México " + valor_final.strftime("%Y/%m/%d, %H:%M"))
+
+        for pais, zona_horaria in TIMEZONES.items():
+            print(pais + ": " + valor_final.astimezone(zona_horaria).strftime("%Y/%m/%d, %H:%M"))
     else:
         print("Cadena inválida")
 
