@@ -15,7 +15,9 @@ pytz = "^2021.1"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
+freezegun = "^1.1.0"
 isort = "^5.7.0"
+pytest = "^6.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
