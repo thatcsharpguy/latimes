@@ -18,6 +18,7 @@ TIMEZONES = {
     "Perú": timezone("America/Lima"),
     "Argentina": timezone("America/Argentina/Buenos_Aires"),
     "Guinea Ecuatorial": timezone("Africa/Malabo"),
+    "Costa Rica": timezone('America/Costa_Rica')
 }
 
 DIAS = {
