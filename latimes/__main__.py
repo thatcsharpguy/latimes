@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from typing import List, Tuple
 
 import click
 from pytz import timezone
@@ -55,16 +56,25 @@ def main(cadena_tiempo: str):
             tzinfo=MEXICO,
         )
 
-        print("México " + valor_final.strftime("%Y/%m/%d, %H:%M"))
+        tiempos = transforma_zonas_horarias(valor_final)
 
-        for pais, zona_horaria in TIMEZONES.items():
-            print(
-                pais
-                + ": "
-                + valor_final.astimezone(zona_horaria).strftime("%Y/%m/%d, %H:%M")
-            )
+        for pais, tiempo in tiempos:
+            print(pais + ": " + tiempo.strftime("%Y/%m/%d, %H:%M"))
+
     else:
         print("Cadena inválida")
+
+
+def interpreta_cadena_tiempo(cadena_tiempo):
+    pass
+
+
+def transforma_zonas_horarias(valor_final: datetime) -> List[Tuple[str, datetime]]:
+    tiempos = []
+    for pais, zona_horaria in TIMEZONES.items():
+        tiempos.append((pais, valor_final.astimezone(zona_horaria)))
+
+    return tiempos
 
 
 if __name__ == "__main__":
