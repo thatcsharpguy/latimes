@@ -18,6 +18,7 @@ black = {version = "^20.8b1", allow-prereleases = true}
 freezegun = "^1.1.0"
 isort = "^5.7.0"
 pytest = "^6.2.2"
+bump2version = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
