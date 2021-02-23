@@ -11,3 +11,6 @@ style:
 lint:
 	$(POETRY_RUN) isort $(SOURCES_FOLDER) --check-only
 	$(POETRY_RUN) black $(SOURCE_FILES) --check
+
+test:
+	$(POETRY_RUN) pytest tests

@@ -1,0 +1,38 @@
+name: Continuous integration
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Setup environment
+        run: |
+          curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+          source $HOME/.poetry/env
+          poetry --version
+
+      - name: Install dependencies
+        run: |
+          source $HOME/.poetry/env
+          poetry --version
+          poetry install
+
+      - name: Lint
+        run: |
+          source $HOME/.poetry/env
+          make lint
+
+      - name: Test
+        run: |
+          source $HOME/.poetry/env
+          make test
