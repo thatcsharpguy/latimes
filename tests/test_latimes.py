@@ -10,10 +10,26 @@ from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
     [
         ("jueves 10 pm", datetime(2021, 2, 25, 22, 00)),
         ("viernes 10 am", datetime(2021, 2, 26, 10, 00)),
-        # ("domingo 8 am", datetime(2021, 2, 28, 8, 00)),
+        ("domingo 8 am", datetime(2021, 2, 28, 8, 00)),
     ]
 )
 def test_interpreta_cadena_tiempo(cadena_entrada, valor_esperado):
+
+    valor_actual = interpreta_cadena_tiempo(cadena_entrada)
+
+    assert valor_esperado == valor_actual
+
+
+@freeze_time("2000-01-01")
+@pytest.mark.parametrize(
+    ["cadena_entrada", "valor_esperado"],
+    [
+        ("lunes 10 pm", datetime(2000, 1, 3, 22, 00)),
+        ("martes 10 am", datetime(2000, 1, 4, 10, 00)),
+        ("jueves 8 am", datetime(2000, 1, 6, 8, 00)),
+    ]
+)
+def test_interpreta_cadena_tiempo_2000(cadena_entrada, valor_esperado):
 
     valor_actual = interpreta_cadena_tiempo(cadena_entrada)
 
