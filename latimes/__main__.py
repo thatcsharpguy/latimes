@@ -27,6 +27,8 @@ DIAS = {
     )
 }
 
+DIA_DOMINGO = 6
+
 
 @click.command()
 @click.argument("cadena_tiempo", type=click.STRING)
@@ -50,24 +52,28 @@ def main(cadena_tiempo: str):
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
     match = TIEMPO_REGEX.match(cadena_tiempo)
-    today = datetime.today() + timedelta(days=-4)
+    today = datetime.today()
 
     if not match:
         return None
 
     valores = match.groupdict()
-    dia_de_la_semana = DIAS[valores["dia"]]
+    dia_usuario = DIAS[valores["dia"]]
 
-    dias_para_domingo = 6 - today.weekday()
-    dias_restantes = ((today.weekday() + dias_para_domingo + dia_de_la_semana) % 6) + 1
-    fecha_usuario = today + timedelta(days=dias_restantes + dias_para_domingo)
+    dia_actual = today.weekday()
+    if dia_usuario > dia_actual:
+        dias_faltantes = dia_usuario - dia_actual
+        fecha_solicitada = today + timedelta(days=dias_faltantes)
+    else:
+        dias_para_domingo = DIA_DOMINGO - dia_actual + 1
+        fecha_solicitada = today + timedelta(days=dias_para_domingo + dia_usuario)
 
     hora = int(valores["hora"]) + (0 if valores["ampm"] == "am" else 12)
 
     return datetime(
-        fecha_usuario.year,
-        fecha_usuario.month,
-        fecha_usuario.day,
+        fecha_solicitada.year,
+        fecha_solicitada.month,
+        fecha_solicitada.day,
         hora,
         0,
     )
