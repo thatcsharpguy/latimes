@@ -6,7 +6,7 @@ import click
 from pytz import timezone
 
 TIEMPO_REGEX = re.compile(
-    "^(?P<dia>[a-zA-Z]+)\s(?P<hora>[0-9]{1,2})\s(?P<ampm>(am|pm|AM|PM))$"
+    "^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})\s(?P<ampm>(am|pm|AM|PM))$"
 )
 MEXICO = timezone("America/Mexico_City")
 
@@ -24,6 +24,26 @@ DIAS = {
     dia: valor
     for valor, dia in enumerate(
         ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+    )
+}
+
+MESES = {
+    mes: valor + 1
+    for valor, mes in enumerate(
+        [
+            "enero",
+            "febrero",
+            "marzo",
+            "abril",
+            "mayo",
+            "junio",
+            "julio",
+            "agosto",
+            "setiembre",
+            "octubre",
+            "noviembre",
+            "diciembre",
+        ]
     )
 }
 
@@ -58,15 +78,22 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
         return None
 
     valores = match.groupdict()
-    dia_usuario = DIAS[valores["dia"]]
 
-    dia_actual = today.weekday()
-    if dia_usuario > dia_actual:
-        dias_faltantes = dia_usuario - dia_actual
-        fecha_solicitada = today + timedelta(days=dias_faltantes)
-    else:
-        dias_para_domingo = DIA_DOMINGO - dia_actual + 1
-        fecha_solicitada = today + timedelta(days=dias_para_domingo + dia_usuario)
+    if valores["dia"] is not None:
+        dia_usuario = DIAS[valores["dia"]]
+
+        dia_actual = today.weekday()
+        if dia_usuario > dia_actual:
+            dias_faltantes = dia_usuario - dia_actual
+            fecha_solicitada = today + timedelta(days=dias_faltantes)
+        else:
+            dias_para_domingo = DIA_DOMINGO - dia_actual + 1
+            fecha_solicitada = today + timedelta(days=dias_para_domingo + dia_usuario)
+    elif valores["fecha"] is not None and valores["mes"] is not None:
+        mes_usuario = MESES[valores["mes"]]
+        dia_usuario = int(valores["fecha"])
+
+        fecha_solicitada = datetime(today.year, mes_usuario, dia_usuario)
 
     hora = int(valores["hora"]) + (0 if valores["ampm"] == "am" else 12)
 
