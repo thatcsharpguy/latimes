@@ -11,6 +11,8 @@ from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
         ("jueves 10 pm", datetime(2021, 2, 25, 22, 00)),
         ("viernes 10 am", datetime(2021, 2, 26, 10, 00)),
         ("domingo 8 am", datetime(2021, 2, 28, 8, 00)),
+        ("27 de febrero 5 pm", datetime(2021, 2, 27, 17, 00)),
+        ("2 de marzo 9 pm", datetime(2021, 3, 2, 21, 00))
     ]
 )
 def test_interpreta_cadena_tiempo(cadena_entrada, valor_esperado):
