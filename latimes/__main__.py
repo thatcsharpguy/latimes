@@ -6,7 +6,7 @@ import click
 from pytz import timezone
 
 TIEMPO_REGEX = re.compile(
-    "^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})\s(?P<ampm>(am|pm|AM|PM))$"
+    r"^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s(?P<ampm>(am|pm|AM|PM))$"
 )
 MEXICO = timezone("America/Mexico_City")
 
@@ -95,6 +95,7 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
 
         fecha_solicitada = datetime(today.year, mes_usuario, dia_usuario)
 
+    minutes = int(valores["minutes"] or 0)
     hora = int(valores["hora"]) + (0 if valores["ampm"] == "am" else 12)
 
     return datetime(
@@ -102,7 +103,7 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
         fecha_solicitada.month,
         fecha_solicitada.day,
         hora,
-        0,
+        minutes,
     )
 
 
