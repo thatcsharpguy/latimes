@@ -2,14 +2,14 @@ from latimes.config import load_config, DEFAULT_VALUES
 from copy import deepcopy
 from pathlib import Path
 from pytz import timezone
-
+import pytest
 
 def test_load_config_gets_default_values():
     expected_values = deepcopy(DEFAULT_VALUES)
     actual_values = load_config(None)
     assert actual_values == expected_values
 
-
+@pytest.fixture
 def config_file():
     configuration_file_path = Path("config.yml")
     with open(configuration_file_path, "w") as writable:
@@ -20,9 +20,10 @@ convert_to:
  - Chile:America/Santiago
  - Costa Rica:America/Costa_Rica
         """)
-    return configuration_file_path
+    yield configuration_file_path
+    configuration_file_path.unlink()
 
-def test_load_config_from_file():
+def test_load_config_from_file(config_file):
     expected_value = {
         "starting_timezone": timezone("America/Mexico_City"),
         "convert_to": {
@@ -32,8 +33,4 @@ def test_load_config_from_file():
         }
     }
 
-    file = config_file()
-
-    assert expected_value == load_config(file)
-
-
+    assert expected_value == load_config(config_file)
