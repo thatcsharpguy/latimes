@@ -1,9 +1,11 @@
 import re
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import List, Tuple
 
 import click
-from pytz import timezone
+
+from latimes.config import load_config
 
 TIEMPO_REGEX = re.compile(
     r"^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s(?P<ampm>(am|pm|AM|PM))$"
@@ -41,16 +43,21 @@ DIA_DOMINGO = 6
 
 @click.command()
 @click.argument("cadena_tiempo", type=click.STRING)
-def main(cadena_tiempo: str):
+@click.option("--config", default=None, type=click.Path(dir_okay=False, exists=True))
+def main(cadena_tiempo: str, config: str):
     """
     CADENA_TIEMPO Este es tu tiempo en lenguaje natural
     """
+
+    config_file = Path(config) if config else None
+
+    configuration = load_config(config_file)
 
     tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
 
     if tiempo_usuario:
 
-        tiempos = transforma_zonas_horarias(tiempo_usuario)
+        tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
 
         for pais, tiempo in tiempos:
             print(pais + ": " + tiempo.strftime("%Y/%m/%d, %H:%M"))
