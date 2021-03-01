@@ -3,6 +3,8 @@ from datetime import datetime
 from freezegun import freeze_time
 from pytz import timezone
 from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
+from latimes.config import DEFAULT_VALUES
+from copy import deepcopy
 
 @freeze_time("2021-02-22")
 @pytest.mark.parametrize(
@@ -50,8 +52,33 @@ def test_transforma_zonas_horarias():
         ('Guinea Ecuatorial', datetime(2021, 2, 22, 17, 0, tzinfo=timezone('Africa/Malabo'))),
         ('Costa Rica', datetime(2021, 2, 22, 10, 0, tzinfo=timezone('America/Costa_Rica'))),
     ]
+    configuration = deepcopy(DEFAULT_VALUES)
 
-    valor_retorno = transforma_zonas_horarias(hora_entrada)
+    valor_retorno = transforma_zonas_horarias(hora_entrada, configuration)
+
+    for (pais_esperado, fecha_esperada), (pais_retorno, fecha_retorno) in zip(horas_esperadas, valor_retorno):
+        assert pais_esperado == pais_retorno
+        assert fecha_esperada.year == fecha_retorno.year
+        assert fecha_esperada.month == fecha_retorno.month
+        assert fecha_esperada.day == fecha_retorno.day
+        assert fecha_esperada.hour == fecha_retorno.hour
+        assert fecha_esperada.minute == fecha_retorno.minute
+
+
+def test_transforma_zonas_horarias_no_default():
+    hora_entrada = datetime(2021, 2, 22, 10, 0)
+    horas_esperadas = [
+        ('Mexico', datetime(2021, 2, 22, 9, 0, tzinfo=timezone('America/Mexico_City'))),
+
+    ]
+    configuration = {
+        "starting_timezone": timezone('America/Bogota'),
+        "convert_to": {
+            "Mexico": timezone("America/Mexico_City")
+        }
+    }
+
+    valor_retorno = transforma_zonas_horarias(hora_entrada, configuration)
 
     for (pais_esperado, fecha_esperada), (pais_retorno, fecha_retorno) in zip(horas_esperadas, valor_retorno):
         assert pais_esperado == pais_retorno

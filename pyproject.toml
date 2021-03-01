@@ -12,6 +12,7 @@ latimes = 'latimes.__main__:main'
 click = "^7.1.2"
 python = "^3.6"
 pytz = "^2021.1"
+PyYAML = "^5.4.1"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}

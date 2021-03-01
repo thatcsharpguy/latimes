@@ -8,17 +8,6 @@ from pytz import timezone
 TIEMPO_REGEX = re.compile(
     r"^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s(?P<ampm>(am|pm|AM|PM))$"
 )
-MEXICO = timezone("America/Mexico_City")
-
-TIMEZONES = {
-    "Colombia": timezone("America/Bogota"),
-    "Chile": timezone("America/Santiago"),
-    "Ecuador": timezone("America/Guayaquil"),
-    "Perú": timezone("America/Lima"),
-    "Argentina": timezone("America/Argentina/Buenos_Aires"),
-    "Guinea Ecuatorial": timezone("Africa/Malabo"),
-    "Costa Rica": timezone("America/Costa_Rica"),
-}
 
 DIAS = {
     dia: valor
@@ -107,10 +96,12 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
     )
 
 
-def transforma_zonas_horarias(valor_final: datetime) -> List[Tuple[str, datetime]]:
+def transforma_zonas_horarias(
+    valor_final: datetime, configuration: dict
+) -> List[Tuple[str, datetime]]:
     tiempos = []
-    valor_localizado = MEXICO.localize(valor_final)
-    for pais, zona_horaria in TIMEZONES.items():
+    valor_localizado = configuration["starting_timezone"].localize(valor_final)
+    for pais, zona_horaria in configuration["convert_to"].items():
         tiempos.append((pais, valor_localizado.astimezone(zona_horaria)))
 
     return tiempos
