@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -51,7 +52,12 @@ def main(cadena_tiempo: str, config: str):
 
     config_file = Path(config) if config else None
 
-    configuration = load_config(config_file)
+    try:
+        configuration = load_config(config_file)
+    except KeyError as keyError:
+        missing_key = keyError.args[0]
+        logging.critical(f"Missing key {missing_key} in config file")
+        raise click.Abort()
 
     tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
 
