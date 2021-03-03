@@ -45,10 +45,17 @@ DIA_DOMINGO = 6
 @click.command()
 @click.argument("cadena_tiempo", type=click.STRING)
 @click.option("--config", default=None, type=click.Path(dir_okay=False, exists=True))
-def main(cadena_tiempo: str, config: str):
+@click.option("-v", "--verbose", count=True)
+def main(cadena_tiempo: str, config: str, verbose: int):
     """
     CADENA_TIEMPO Este es tu tiempo en lenguaje natural
     """
+    if verbose > 1:
+        logging.basicConfig(level=logging.DEBUG)
+    if verbose > 0:
+        logging.basicConfig(level=logging.INFO)
+
+    logging.debug("Set logging level to " + str(logging.root.level))
 
     config_file = Path(config) if config else None
 
@@ -75,6 +82,8 @@ def main(cadena_tiempo: str, config: str):
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
     match = TIEMPO_REGEX.match(cadena_tiempo)
     today = datetime.today()
+
+    logging.info(f"Today's date is {today.isoformat()}")
 
     if not match:
         return None
