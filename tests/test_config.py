@@ -34,3 +34,21 @@ def test_load_config_from_file(config_file):
     }
 
     assert expected_value == load_config(config_file)
+
+
+@pytest.fixture
+def broken_config_file():
+    configuration_file_path = Path("config.yml")
+    with open(configuration_file_path, "w") as writable:
+        writable.write("""
+convert_to:
+ - Colombia:America/Bogota
+ - Chile:America/Santiago
+ - Costa Rica:America/Costa_Rica
+        """)
+    yield configuration_file_path
+    configuration_file_path.unlink()
+
+def test_load_config_from_file_fails_missing_key(broken_config_file):
+    with pytest.raises(KeyError):
+        load_config(broken_config_file)
