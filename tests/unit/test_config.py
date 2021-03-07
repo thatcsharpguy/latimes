@@ -7,9 +7,10 @@ from pytz import timezone
 from latimes.config import DEFAULT_VALUES, load_config
 
 
-def test_load_config_gets_default_values():
+@pytest.mark.parametrize("path", (None, Path("i-dont-exist.yml")))
+def test_load_config_gets_default_values(path):
     expected_values = deepcopy(DEFAULT_VALUES)
-    actual_values = load_config(None)
+    actual_values = load_config(path)
     assert actual_values == expected_values
 
 
@@ -40,9 +41,9 @@ def test_load_config_from_file(config_file):
         },
         "output_formatting": {
             "time_format_string": "%H:%M",
-            "aggregate_joiner": ", ",
+            "aggregate_joiner": "",
             "aggregate": True,
-            "different_time_joiner": "; ",
+            "different_time_joiner": ", ",
         },
     }
 
@@ -81,7 +82,7 @@ def test_load_config_from_file_partial(config_file_partial_output):
             "time_format_string": "%H:%M",
             "aggregate_joiner": " $$$ ",
             "aggregate": False,
-            "different_time_joiner": "; ",
+            "different_time_joiner": ", ",
         },
     }
 

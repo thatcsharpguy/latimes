@@ -12,10 +12,4 @@ def test_main():
     result = runner.invoke(main, ["jueves", "10:00", "am"])
 
     assert result.exit_code == 0
-    assert result.stdout == (
-        "10:00 México, Costa Rica; "
-        + "11:00 Colombia, Ecuador, Perú; "
-        + "13:00 Chile, Argentina; "
-        + "17:00 Guinea Ecuatorial"
-        + "\n"
-    )
+    assert result.stdout == "10:00 🇲🇽🇨🇷, 11:00 🇨🇴🇪🇨🇵🇪, 13:00 🇨🇱🇦🇷, 17:00 🇬🇶\n"
