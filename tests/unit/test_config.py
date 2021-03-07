@@ -41,9 +41,9 @@ def test_load_config_from_file(config_file):
         },
         "output_formatting": {
             "time_format_string": "%H:%M",
-            "aggregate_joiner": ", ",
+            "aggregate_joiner": "",
             "aggregate": True,
-            "different_time_joiner": "; ",
+            "different_time_joiner": ", ",
         },
     }
 
@@ -82,7 +82,7 @@ def test_load_config_from_file_partial(config_file_partial_output):
             "time_format_string": "%H:%M",
             "aggregate_joiner": " $$$ ",
             "aggregate": False,
-            "different_time_joiner": "; ",
+            "different_time_joiner": ", ",
         },
     }
 

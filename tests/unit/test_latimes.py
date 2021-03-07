@@ -61,25 +61,25 @@ def test_transforma_zonas_horarias():
     hora_entrada = datetime(2021, 2, 22, 10, 0)
     horas_esperadas = [
         (
-            "México",
+            "🇲🇽",
             datetime(2021, 2, 22, 10, 0, tzinfo=timezone("America/Mexico_City")),
         ),
-        ("Colombia", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Bogota"))),
-        ("Chile", datetime(2021, 2, 22, 13, 0, tzinfo=timezone("America/Santiago"))),
-        ("Ecuador", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Guayaquil"))),
-        ("Perú", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Lima"))),
+        ("🇨🇴", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Bogota"))),
+        ("🇨🇱", datetime(2021, 2, 22, 13, 0, tzinfo=timezone("America/Santiago"))),
+        ("🇪🇨", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Guayaquil"))),
+        ("🇵🇪", datetime(2021, 2, 22, 11, 0, tzinfo=timezone("America/Lima"))),
         (
-            "Argentina",
+            "🇦🇷",
             datetime(
                 2021, 2, 22, 13, 0, tzinfo=timezone("America/Argentina/Buenos_Aires")
             ),
         ),
         (
-            "Guinea Ecuatorial",
+            "🇬🇶",
             datetime(2021, 2, 22, 17, 0, tzinfo=timezone("Africa/Malabo")),
         ),
         (
-            "Costa Rica",
+            "🇨🇷",
             datetime(2021, 2, 22, 10, 0, tzinfo=timezone("America/Costa_Rica")),
         ),
     ]

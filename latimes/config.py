@@ -7,21 +7,21 @@ import yaml
 from pytz import timezone
 
 TIME_FORMAT_STRING = "%H:%M"
-AGGREGATE_JOINER = ", "
+AGGREGATE_JOINER = ""
 AGGREGATE = True
-DIFFERENT_TIME_JOINER = "; "
+DIFFERENT_TIME_JOINER = ", "
 
 DEFAULT_VALUES = {
     "starting_timezone": timezone("America/Mexico_City"),
     "convert_to": {
-        "México": timezone("America/Mexico_City"),
-        "Colombia": timezone("America/Bogota"),
-        "Chile": timezone("America/Santiago"),
-        "Ecuador": timezone("America/Guayaquil"),
-        "Perú": timezone("America/Lima"),
-        "Argentina": timezone("America/Argentina/Buenos_Aires"),
-        "Guinea Ecuatorial": timezone("Africa/Malabo"),
-        "Costa Rica": timezone("America/Costa_Rica"),
+        "🇲🇽": timezone("America/Mexico_City"),
+        "🇨🇴": timezone("America/Bogota"),
+        "🇨🇱": timezone("America/Santiago"),
+        "🇪🇨": timezone("America/Guayaquil"),
+        "🇵🇪": timezone("America/Lima"),
+        "🇦🇷": timezone("America/Argentina/Buenos_Aires"),
+        "🇬🇶": timezone("Africa/Malabo"),
+        "🇨🇷": timezone("America/Costa_Rica"),
     },
     "output_formatting": {
         "time_format_string": TIME_FORMAT_STRING,
@@ -64,3 +64,18 @@ def load_config(file: Path) -> dict:
     )
     real_configuration["output_formatting"] = output_formatting
     return real_configuration
+
+
+def write_config(file: Path):
+    dumpable = dict()
+    dumpable["starting_timezone"] = DEFAULT_VALUES["starting_timezone"].zone
+    dumpable["convert_to"] = [
+        f"{name}:{tz.zone}" for name, tz in DEFAULT_VALUES["convert_to"].items()
+    ]
+    dumpable["output_formatting"] = DEFAULT_VALUES["output_formatting"]
+    with open(file, "w", encoding="utf8") as writable:
+        writable.write("# The timezones must be expressed in TZ timezone\n")
+        writable.write(
+            "# https://en.wikipedia.org/wiki/List_of_tz_database_time_zones\n"
+        )
+        yaml.safe_dump(dumpable, writable)

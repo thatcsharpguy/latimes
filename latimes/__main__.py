@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 
 import click
 
-from latimes.config import load_config
+from latimes.config import load_config, write_config
 
 TIEMPO_REGEX = re.compile(
     r"^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s(?P<ampm>(am|pm|AM|PM))$"
@@ -42,12 +42,20 @@ MESES = {
 
 DIA_DOMINGO = 6
 
+#
+#
+
+#    if create_config:
+#        pass
+#        return
+
 
 @click.command()
 @click.argument("time_string", nargs=-1, type=click.STRING)
-@click.option("--config", default=None, type=click.Path(dir_okay=False, exists=True))
+@click.option("--config", default=None, type=click.Path(dir_okay=False))
+@click.option("--create-config/--no-create-config", default=False)
 @click.option("-v", "--verbose", count=True)
-def main(time_string: List[str], config: str, verbose: int):
+def main(time_string: List[str], config: str, create_config: bool, verbose: int):
     """
     TIME_STRING Este es tu tiempo en lenguaje natural
     """
@@ -58,6 +66,11 @@ def main(time_string: List[str], config: str, verbose: int):
     else:
         logging.info("Will try to use default configuration file config.yml")
         config_file = Path("config.yml")
+
+    if create_config:
+        write_config(config_file)
+        click.echo(f"Config file generated at {str(config_file)}")
+        return
 
     time_string = " ".join(time_string)
 
