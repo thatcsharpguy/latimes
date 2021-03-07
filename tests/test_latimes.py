@@ -1,10 +1,13 @@
-import pytest
+from copy import deepcopy
 from datetime import datetime
+
+import pytest
 from freezegun import freeze_time
 from pytz import timezone
+
 from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
 from latimes.config import DEFAULT_VALUES
-from copy import deepcopy
+
 
 @freeze_time("2021-02-22")
 @pytest.mark.parametrize(
