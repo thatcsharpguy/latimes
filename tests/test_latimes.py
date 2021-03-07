@@ -43,6 +43,20 @@ def test_interpreta_cadena_tiempo_2000(cadena_entrada, valor_esperado):
 
     assert valor_esperado == valor_actual
 
+@pytest.mark.parametrize(
+    "cadena_entrada",
+    [
+        ("lunes10 pm"),
+        ("xD pm"),
+    ]
+)
+def test_interpreta_cadena_fails(cadena_entrada):
+
+    with pytest.raises(ValueError):
+        interpreta_cadena_tiempo(cadena_entrada)
+
+
+
 
 def test_transforma_zonas_horarias():
     hora_entrada = datetime(2021, 2, 22, 10, 0)
