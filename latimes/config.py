@@ -1,4 +1,5 @@
 import collections.abc
+import logging
 from pathlib import Path
 from typing import Optional
 
@@ -40,8 +41,8 @@ def _update(anchor, updated):
     return anchor
 
 
-def load_config(file: Optional[Path]) -> dict:
-    if not file:
+def load_config(file: Path) -> dict:
+    if not file or not file.exists():
         return DEFAULT_VALUES
 
     with open(file) as readable:

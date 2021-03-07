@@ -7,9 +7,10 @@ from pytz import timezone
 from latimes.config import DEFAULT_VALUES, load_config
 
 
-def test_load_config_gets_default_values():
+@pytest.mark.parametrize("path", (None, Path("i-dont-exist.yml")))
+def test_load_config_gets_default_values(path):
     expected_values = deepcopy(DEFAULT_VALUES)
-    actual_values = load_config(None)
+    actual_values = load_config(path)
     assert actual_values == expected_values
 
 

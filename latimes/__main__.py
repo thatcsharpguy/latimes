@@ -51,10 +51,15 @@ def main(time_string: List[str], config: str, verbose: int):
     """
     TIME_STRING Este es tu tiempo en lenguaje natural
     """
-    time_string = " ".join(time_string)
     setup_logging(verbose)
 
-    config_file = Path(config) if config else None
+    if config:
+        config_file = Path(config)
+    else:
+        logging.info("Will try to use default configuration file config.yml")
+        config_file = Path("config.yml")
+
+    time_string = " ".join(time_string)
 
     try:
         configuration = load_config(config_file)
