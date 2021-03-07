@@ -2,7 +2,7 @@ POETRY=poetry
 POETRY_RUN=$(POETRY) run
 
 SOURCE_FILES=$(shell find . -path "./latimes/*.py")
-TEST_FILES=$(shell find . -path "./test/*.py")
+TEST_FILES=$(shell find . -path "./tests/**/*.py")
 SOURCES_FOLDER=latimes
 
 style:

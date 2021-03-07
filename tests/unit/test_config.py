@@ -17,13 +17,15 @@ def test_load_config_gets_default_values():
 def config_file():
     configuration_file_path = Path("config.yml")
     with open(configuration_file_path, "w") as writable:
-        writable.write("""
+        writable.write(
+            """
 starting_timezone: America/Mexico_City
 convert_to:
  - Colombia:America/Bogota
  - Chile:America/Santiago
  - Costa Rica:America/Costa_Rica
-        """)
+        """
+        )
     yield configuration_file_path
     configuration_file_path.unlink()
 
@@ -37,7 +39,7 @@ def test_load_config_from_file(config_file):
             "Costa Rica": timezone("America/Costa_Rica"),
         },
         "output_formatting": {
-            "time_format_string":  "%H:%M",
+            "time_format_string": "%H:%M",
             "aggregate_joiner": ", ",
             "aggregate": True,
             "different_time_joiner": "; ",
@@ -47,12 +49,12 @@ def test_load_config_from_file(config_file):
     assert expected_value == load_config(config_file)
 
 
-
 @pytest.fixture
 def config_file_partial_output():
     configuration_file_path = Path("config.yml")
     with open(configuration_file_path, "w") as writable:
-        writable.write("""
+        writable.write(
+            """
 starting_timezone: America/Mexico_City
 convert_to:
  - Colombia:America/Bogota
@@ -61,7 +63,8 @@ convert_to:
 output_formatting:
     aggregate_joiner: " $$$ "
     aggregate: false
-        """)
+        """
+        )
     yield configuration_file_path
     configuration_file_path.unlink()
 
@@ -75,7 +78,7 @@ def test_load_config_from_file_partial(config_file_partial_output):
             "Costa Rica": timezone("America/Costa_Rica"),
         },
         "output_formatting": {
-            "time_format_string":  "%H:%M",
+            "time_format_string": "%H:%M",
             "aggregate_joiner": " $$$ ",
             "aggregate": False,
             "different_time_joiner": "; ",
@@ -84,16 +87,19 @@ def test_load_config_from_file_partial(config_file_partial_output):
 
     assert expected_value == load_config(config_file_partial_output)
 
+
 @pytest.fixture
 def broken_config_file():
     configuration_file_path = Path("config.yml")
     with open(configuration_file_path, "w") as writable:
-        writable.write("""
+        writable.write(
+            """
 convert_to:
  - Colombia:America/Bogota
  - Chile:America/Santiago
  - Costa Rica:America/Costa_Rica
-        """)
+        """
+        )
     yield configuration_file_path
     configuration_file_path.unlink()
 
