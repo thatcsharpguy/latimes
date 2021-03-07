@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "latimes"
-version = "0.0.3"
+version = "0.1.0"
 description = "Convierte tiempos"
 authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
 license = "MIT"
