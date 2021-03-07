@@ -44,19 +44,15 @@ DIA_DOMINGO = 6
 
 
 @click.command()
-@click.argument("cadena_tiempo", type=click.STRING)
+@click.argument("time_string", nargs=-1, type=click.STRING)
 @click.option("--config", default=None, type=click.Path(dir_okay=False, exists=True))
 @click.option("-v", "--verbose", count=True)
-def main(cadena_tiempo: str, config: str, verbose: int):
+def main(time_string: List[str], config: str, verbose: int):
     """
-    CADENA_TIEMPO Este es tu tiempo en lenguaje natural
+    TIME_STRING Este es tu tiempo en lenguaje natural
     """
-    if verbose > 1:
-        logging.basicConfig(level=logging.DEBUG)
-    if verbose > 0:
-        logging.basicConfig(level=logging.INFO)
-
-    logging.debug("Set logging level to " + str(logging.root.level))
+    time_string = " ".join(time_string)
+    setup_logging(verbose)
 
     config_file = Path(config) if config else None
 
@@ -67,17 +63,27 @@ def main(cadena_tiempo: str, config: str, verbose: int):
         logging.error(f"Missing key {missing_key} in config file")
         raise click.Abort()
 
+    result = process_date(time_string, configuration)
+
+    print(result)
+
+
+def process_date(cadena_tiempo: str, configuration: dict) -> str:
     try:
         tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
     except ValueError:
         logging.error(f'"{cadena_tiempo}" is not a valid time string')
         raise click.Abort()
-
     tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
+    return format_results(tiempo_usuario, tiempos, configuration["output_formatting"])
 
-    result = format_results(tiempo_usuario, tiempos, configuration["output_formatting"])
 
-    print(result)
+def setup_logging(verbose):
+    if verbose > 1:
+        logging.basicConfig(level=logging.DEBUG)
+    if verbose > 0:
+        logging.basicConfig(level=logging.INFO)
+    logging.debug("Set logging level to " + str(logging.root.level))
 
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:

@@ -13,6 +13,7 @@ DIFFERENT_TIME_JOINER = "; "
 DEFAULT_VALUES = {
     "starting_timezone": timezone("America/Mexico_City"),
     "convert_to": {
+        "México": timezone("America/Mexico_City"),
         "Colombia": timezone("America/Bogota"),
         "Chile": timezone("America/Santiago"),
         "Ecuador": timezone("America/Guayaquil"),

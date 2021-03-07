@@ -11,7 +11,7 @@ Use *latimes* to convert your natural language dates/times (in central México t
 Usage:
 
 ```shell
-latimes "jueves 10:33 am"
+latimes jueves 10:33 am
 ```
 
 Output:
