@@ -63,20 +63,19 @@ def main(cadena_tiempo: str, config: str, verbose: int):
         configuration = load_config(config_file)
     except KeyError as keyError:
         missing_key = keyError.args[0]
-        logging.critical(f"Missing key {missing_key} in config file")
+        logging.error(f"Missing key {missing_key} in config file")
         raise click.Abort()
 
-    tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
+    try:
+        tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
+    except ValueError:
+        logging.error(f'"{cadena_tiempo}" is not a valid time string')
+        raise click.Abort()
 
-    if tiempo_usuario:
+    tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
 
-        tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
-
-        for pais, tiempo in tiempos:
-            print(pais + ": " + tiempo.strftime("%Y/%m/%d, %H:%M"))
-
-    else:
-        print("Cadena inválida")
+    for pais, tiempo in tiempos:
+        print(pais + ": " + tiempo.strftime("%Y/%m/%d, %H:%M"))
 
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
@@ -86,7 +85,7 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
     logging.info(f"Today's date is {today.isoformat()}")
 
     if not match:
-        return None
+        raise ValueError(f'"{cadena_tiempo}" is not a valid time string')
 
     valores = match.groupdict()
 
