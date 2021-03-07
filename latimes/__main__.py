@@ -1,8 +1,9 @@
 import logging
 import re
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import click
 
@@ -74,8 +75,9 @@ def main(cadena_tiempo: str, config: str, verbose: int):
 
     tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
 
-    for pais, tiempo in tiempos:
-        print(pais + ": " + tiempo.strftime("%Y/%m/%d, %H:%M"))
+    result = format_results(tiempo_usuario, tiempos, configuration["output_formatting"])
+
+    print(result)
 
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
@@ -126,6 +128,40 @@ def transforma_zonas_horarias(
         tiempos.append((pais, valor_localizado.astimezone(zona_horaria)))
 
     return tiempos
+
+
+DateDiff = namedtuple("DateDiff", ["time", "day_difference"])
+
+
+def format_results(
+    anchor_datetime: datetime,
+    results: List[Tuple[str, datetime]],
+    output_formatting: dict,
+) -> str:
+    aggregates: Dict[DateDiff, List[str]] = defaultdict(list)
+
+    for pais, time in results:
+        restored_time = time.replace(tzinfo=None)
+        difference = restored_time.date() - anchor_datetime.date()
+        date_diff = DateDiff(restored_time, difference.days)
+        aggregates[date_diff].append(pais)
+
+    times = []
+    for date_diff, time_zones in aggregates.items():
+        time_formatted = date_diff.time.strftime(
+            output_formatting["time_format_string"]
+        )
+        if date_diff.day_difference:
+            time_formatted += "%+d" % date_diff.day_difference
+
+        if output_formatting["aggregate"]:
+            joint_timezones = output_formatting["aggregate_joiner"].join(time_zones)
+            times.append(f"{time_formatted} {joint_timezones}")
+        else:
+            for time_zone in time_zones:
+                times.append(f"{time_formatted} {time_zone}")
+
+    return output_formatting["different_time_joiner"].join(times)
 
 
 if __name__ == "__main__":
