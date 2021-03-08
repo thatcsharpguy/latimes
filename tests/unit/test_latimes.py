@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from pytz import timezone
 
 from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
-from latimes.config import DEFAULT_VALUES
+from latimes.config import DEFAULT_VALUES, LatimesConfiguration
 
 
 @freeze_time("2021-02-22")
@@ -83,7 +83,7 @@ def test_transforma_zonas_horarias():
             datetime(2021, 2, 22, 10, 0, tzinfo=timezone("America/Costa_Rica")),
         ),
     ]
-    configuration = deepcopy(DEFAULT_VALUES)
+    configuration = LatimesConfiguration.from_dict(deepcopy(DEFAULT_VALUES))
 
     valor_retorno = transforma_zonas_horarias(hora_entrada, configuration)
 
@@ -103,10 +103,9 @@ def test_transforma_zonas_horarias_no_default():
     horas_esperadas = [
         ("Mexico", datetime(2021, 2, 22, 9, 0, tzinfo=timezone("America/Mexico_City"))),
     ]
-    configuration = {
-        "starting_timezone": timezone("America/Bogota"),
-        "convert_to": {"Mexico": timezone("America/Mexico_City")},
-    }
+    configuration = LatimesConfiguration(
+        "America/Bogota", ["Mexico:America/Mexico_City"], None
+    )
 
     valor_retorno = transforma_zonas_horarias(hora_entrada, configuration)
 

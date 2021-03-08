@@ -4,6 +4,7 @@ from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
 
+from latimes.config import LatimesConfiguration, LatimesOutputFormatting
 from latimes.exceptions import InvalidTimeStringException
 
 TIEMPO_REGEX = re.compile(
@@ -37,13 +38,13 @@ MESES = {
 DIA_DOMINGO = 6
 
 
-def convert_times(cadena_tiempo: str, configuration: dict) -> str:
+def convert_times(cadena_tiempo: str, configuration: LatimesConfiguration) -> str:
     try:
         tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
     except ValueError as value_error:
         raise InvalidTimeStringException() from value_error
     tiempos = transforma_zonas_horarias(tiempo_usuario, configuration)
-    return format_results(tiempo_usuario, tiempos, configuration["output_formatting"])
+    return format_results(tiempo_usuario, tiempos, configuration.output_formatting)
 
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
@@ -86,11 +87,11 @@ def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
 
 
 def transforma_zonas_horarias(
-    valor_final: datetime, configuration: dict
+    valor_final: datetime, configuration: LatimesConfiguration
 ) -> List[Tuple[str, datetime]]:
     tiempos = []
-    valor_localizado = configuration["starting_timezone"].localize(valor_final)
-    for pais, zona_horaria in configuration["convert_to"].items():
+    valor_localizado = configuration.starting_timezone.localize(valor_final)
+    for pais, zona_horaria in configuration.convert_to.items():
         tiempos.append((pais, valor_localizado.astimezone(zona_horaria)))
 
     return tiempos
@@ -102,7 +103,7 @@ DateDiff = namedtuple("DateDiff", ["time", "day_difference"])
 def format_results(
     anchor_datetime: datetime,
     results: List[Tuple[str, datetime]],
-    output_formatting: dict,
+    output_formatting: LatimesOutputFormatting,
 ) -> str:
     aggregates: Dict[DateDiff, List[str]] = defaultdict(list)
 
@@ -114,17 +115,15 @@ def format_results(
 
     times = []
     for date_diff, time_zones in aggregates.items():
-        time_formatted = date_diff.time.strftime(
-            output_formatting["time_format_string"]
-        )
+        time_formatted = date_diff.time.strftime(output_formatting.time_format_string)
         if date_diff.day_difference:
             time_formatted += "%+d" % date_diff.day_difference
 
-        if output_formatting["aggregate"]:
-            joint_timezones = output_formatting["aggregate_joiner"].join(time_zones)
+        if output_formatting.aggregate:
+            joint_timezones = output_formatting.aggregate_joiner.join(time_zones)
             times.append(f"{time_formatted} {joint_timezones}")
         else:
             for time_zone in time_zones:
                 times.append(f"{time_formatted} {time_zone}")
 
-    return output_formatting["different_time_joiner"].join(times)
+    return output_formatting.different_time_joiner.join(times)
