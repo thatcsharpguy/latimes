@@ -2,14 +2,13 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
-from pytz import timezone
 
-from latimes.config import DEFAULT_VALUES, load_config
+from latimes.config import DEFAULT_VALUES, LatimesConfiguration, load_config
 
 
 @pytest.mark.parametrize("path", (None, Path("i-dont-exist.yml")))
 def test_load_config_gets_default_values(path):
-    expected_values = deepcopy(DEFAULT_VALUES)
+    expected_values = LatimesConfiguration.from_dict(deepcopy(DEFAULT_VALUES))
     actual_values = load_config(path)
     assert actual_values == expected_values
 
@@ -32,20 +31,22 @@ convert_to:
 
 
 def test_load_config_from_file(config_file):
-    expected_value = {
-        "starting_timezone": timezone("America/Mexico_City"),
-        "convert_to": {
-            "Colombia": timezone("America/Bogota"),
-            "Chile": timezone("America/Santiago"),
-            "Costa Rica": timezone("America/Costa_Rica"),
-        },
-        "output_formatting": {
-            "time_format_string": "%H:%M",
-            "aggregate_joiner": "",
-            "aggregate": True,
-            "different_time_joiner": ", ",
-        },
-    }
+    expected_value = LatimesConfiguration.from_dict(
+        {
+            "starting_timezone": "America/Mexico_City",
+            "convert_to": [
+                "Colombia:America/Bogota",
+                "Chile:America/Santiago",
+                "Costa Rica:America/Costa_Rica",
+            ],
+            "output_formatting": {
+                "time_format_string": "%H:%M",
+                "aggregate_joiner": "",
+                "aggregate": True,
+                "different_time_joiner": ", ",
+            },
+        }
+    )
 
     assert expected_value == load_config(config_file)
 
@@ -71,20 +72,22 @@ output_formatting:
 
 
 def test_load_config_from_file_partial(config_file_partial_output):
-    expected_value = {
-        "starting_timezone": timezone("America/Mexico_City"),
-        "convert_to": {
-            "Colombia": timezone("America/Bogota"),
-            "Chile": timezone("America/Santiago"),
-            "Costa Rica": timezone("America/Costa_Rica"),
-        },
-        "output_formatting": {
-            "time_format_string": "%H:%M",
-            "aggregate_joiner": " $$$ ",
-            "aggregate": False,
-            "different_time_joiner": ", ",
-        },
-    }
+    expected_value = LatimesConfiguration.from_dict(
+        {
+            "starting_timezone": "America/Mexico_City",
+            "convert_to": [
+                "Colombia:America/Bogota",
+                "Chile:America/Santiago",
+                "Costa Rica:America/Costa_Rica",
+            ],
+            "output_formatting": {
+                "time_format_string": "%H:%M",
+                "aggregate_joiner": " $$$ ",
+                "aggregate": False,
+                "different_time_joiner": ", ",
+            },
+        }
+    )
 
     assert expected_value == load_config(config_file_partial_output)
 

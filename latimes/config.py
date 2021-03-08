@@ -1,10 +1,75 @@
 import collections.abc
-import logging
 from pathlib import Path
-from typing import Optional
+from typing import Dict, List
 
 import yaml
 from pytz import timezone
+
+
+class LatimesOutputFormatting:
+    def __init__(
+        self,
+        time_format_string: str,
+        different_time_joiner: str,
+        aggregate_joiner: str,
+        aggregate: bool,
+    ):
+        self.aggregate = aggregate
+        self.aggregate_joiner = aggregate_joiner
+        self.time_format_string = time_format_string
+        self.different_time_joiner = different_time_joiner
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, LatimesOutputFormatting):
+            return False
+        return (
+            other.time_format_string == self.time_format_string
+            and other.different_time_joiner == self.different_time_joiner
+            and other.aggregate == self.aggregate
+            and other.aggregate_joiner == self.aggregate_joiner
+        )
+
+    @classmethod
+    def from_dict(cls, dictionary: Dict):
+        return cls(**dictionary)
+
+
+class LatimesConfiguration:
+    def __init__(
+        self,
+        starting_timezone: str,
+        convert_to: List[str],
+        output_formatting: LatimesOutputFormatting,
+    ):
+        self.output_formatting = output_formatting
+        self.convert_to = {}
+
+        for content in convert_to:
+            label, _, tz = content.partition(":")
+            self.convert_to[label] = timezone(tz)
+        self.starting_timezone = timezone(starting_timezone)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, LatimesConfiguration):
+            return False
+
+        return (
+            other.convert_to == self.convert_to
+            and other.output_formatting == self.output_formatting
+            and other.starting_timezone == self.starting_timezone
+        )
+
+    @classmethod
+    def from_dict(cls, dictionary: Dict):
+        output_format = LatimesOutputFormatting.from_dict(
+            dictionary["output_formatting"]
+        )
+        return cls(
+            starting_timezone=dictionary["starting_timezone"],
+            convert_to=dictionary["convert_to"],
+            output_formatting=output_format,
+        )
+
 
 TIME_FORMAT_STRING = "%H:%M"
 AGGREGATE_JOINER = ""
@@ -12,17 +77,17 @@ AGGREGATE = True
 DIFFERENT_TIME_JOINER = ", "
 
 DEFAULT_VALUES = {
-    "starting_timezone": timezone("America/Mexico_City"),
-    "convert_to": {
-        "🇲🇽": timezone("America/Mexico_City"),
-        "🇨🇴": timezone("America/Bogota"),
-        "🇨🇱": timezone("America/Santiago"),
-        "🇪🇨": timezone("America/Guayaquil"),
-        "🇵🇪": timezone("America/Lima"),
-        "🇦🇷": timezone("America/Argentina/Buenos_Aires"),
-        "🇬🇶": timezone("Africa/Malabo"),
-        "🇨🇷": timezone("America/Costa_Rica"),
-    },
+    "starting_timezone": "America/Mexico_City",
+    "convert_to": [
+        "🇲🇽:America/Mexico_City",
+        "🇨🇴:America/Bogota",
+        "🇨🇱:America/Santiago",
+        "🇪🇨:America/Guayaquil",
+        "🇵🇪:America/Lima",
+        "🇦🇷:America/Argentina/Buenos_Aires",
+        "🇬🇶:Africa/Malabo",
+        "🇨🇷:America/Costa_Rica",
+    ],
     "output_formatting": {
         "time_format_string": TIME_FORMAT_STRING,
         "aggregate_joiner": AGGREGATE_JOINER,
@@ -41,41 +106,25 @@ def _update(anchor, updated):
     return anchor
 
 
-def load_config(file: Path) -> dict:
+def load_config(file: Path) -> LatimesConfiguration:
     if not file or not file.exists():
-        return DEFAULT_VALUES
+        return LatimesConfiguration.from_dict(DEFAULT_VALUES)
 
     with open(file) as readable:
         configuration = yaml.safe_load(readable)
-
-    real_configuration = dict()
-
-    real_configuration["starting_timezone"] = timezone(
-        configuration["starting_timezone"]
-    )
-    real_configuration["convert_to"] = {}
-    for convert_to_value in configuration["convert_to"]:
-        zone_name, _, zone_code = convert_to_value.partition(":")
-        real_configuration["convert_to"][zone_name] = timezone(zone_code)
 
     output_formatting = _update(
         configuration.get("output_formatting", dict()),
         DEFAULT_VALUES["output_formatting"],
     )
-    real_configuration["output_formatting"] = output_formatting
-    return real_configuration
+    configuration["output_formatting"] = output_formatting
+    return LatimesConfiguration.from_dict(configuration)
 
 
 def write_config(file: Path):
-    dumpable = dict()
-    dumpable["starting_timezone"] = DEFAULT_VALUES["starting_timezone"].zone
-    dumpable["convert_to"] = [
-        f"{name}:{tz.zone}" for name, tz in DEFAULT_VALUES["convert_to"].items()
-    ]
-    dumpable["output_formatting"] = DEFAULT_VALUES["output_formatting"]
     with open(file, "w", encoding="utf8") as writable:
         writable.write("# The timezones must be expressed in TZ timezone\n")
         writable.write(
             "# https://en.wikipedia.org/wiki/List_of_tz_database_time_zones\n"
         )
-        yaml.safe_dump(dumpable, writable)
+        yaml.safe_dump(DEFAULT_VALUES, writable)
