@@ -1,7 +1,5 @@
 import collections.abc
-import logging
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from pytz import timezone
