@@ -6,7 +6,7 @@
 Download it from:
  [![PyPI version shields.io](https://img.shields.io/pypi/v/latimes.svg)](https://pypi.python.org/pypi/latimes/)
 
-Use *latimes* to convert your natural language dates/times (in central México time) from one timezone to another.
+Use *latimes* to convert your natural language dates/times (in your timezone of choice) from one timezone to another.
 
 ## Out of the box usage
 
@@ -50,7 +50,7 @@ output_formatting:
 starting_timezone: America/Mexico_City
 ```
 
-**Don't get turned away by the `\U0001F1F2\U0001F1FD`**, that is just the code for this 🇲🇽 emoji, you cans safely change whatever goes before the `:` in each of the entries under `convert_to` to any key you want, for example if you have this file:  
+**Don't get turned away by the `\U0001F1F2\U0001F1FD`**, that is just the code for this 🇲🇽 emoji, you can safely change whatever goes before the `:` in each of the entries under `convert_to` to any key you want, for example if you have this file:  
 
 ```yaml
 starting_timezone: Europe/London
