@@ -1,15 +1,26 @@
 import logging
 import re
 from collections import defaultdict, namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List, Tuple
+
+from dateutil.relativedelta import relativedelta
+from unidecode import unidecode
 
 from latimes.config import LatimesConfiguration, LatimesOutputFormatting
 from latimes.exceptions import InvalidTimeStringException
 
-TIEMPO_REGEX = re.compile(
-    r"^((?P<dia>[a-zA-Z]+)|(?P<fecha>\d{1,2})\sde\s(?P<mes>[a-zA-Z]+))\s(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s(?P<ampm>(am|pm|AM|PM))$"
+TIME_REGEX_PORTION = (
+    r"(?P<hora>[0-9]{1,2})(?::(?P<minutes>[0-9]{1,2}))?\s?(?P<period>(am|pm|AM|PM))$"
 )
+
+TIEMPO_REGEXES = [
+    re.compile(r"^(?P<dia>[a-zA-Z]+)\s" + TIME_REGEX_PORTION),
+    re.compile(
+        r"^(?P<dia>[0-9]{1,2})\s(de)?\s?(?P<mes>[a-zA-Z]+)\s" + TIME_REGEX_PORTION
+    ),
+]
+
 DIAS = {
     dia: valor
     for valor, dia in enumerate(
@@ -48,34 +59,41 @@ def convert_times(cadena_tiempo: str, configuration: LatimesConfiguration) -> st
 
 
 def interpreta_cadena_tiempo(cadena_tiempo: str) -> datetime:
-    match = TIEMPO_REGEX.match(cadena_tiempo)
     today = datetime.today()
-
+    clean_time_string = unidecode(cadena_tiempo.lower())
     logging.info(f"Today's date is {today.isoformat()}")
-
-    if not match:
+    logging.info(f"Processing {clean_time_string}")
+    for regex in TIEMPO_REGEXES:
+        match = regex.match(clean_time_string)
+        if match:
+            break
+    else:
         raise ValueError(f'"{cadena_tiempo}" is not a valid time string')
 
     valores = match.groupdict()
 
-    if valores["dia"] is not None:
-        dia_usuario = DIAS[valores["dia"]]
+    if "mes" not in valores:
+        dia_usuario = DIAS[valores["dia"].casefold()]
 
         dia_actual = today.weekday()
         if dia_usuario > dia_actual:
             dias_faltantes = dia_usuario - dia_actual
-            fecha_solicitada = today + timedelta(days=dias_faltantes)
+            fecha_solicitada = today + relativedelta(days=dias_faltantes)
         else:
             dias_para_domingo = DIA_DOMINGO - dia_actual + 1
-            fecha_solicitada = today + timedelta(days=dias_para_domingo + dia_usuario)
-    elif valores["fecha"] is not None and valores["mes"] is not None:
+            fecha_solicitada = today + relativedelta(
+                days=dias_para_domingo + dia_usuario
+            )
+    else:
         mes_usuario = MESES[valores["mes"]]
-        dia_usuario = int(valores["fecha"])
+        dia_usuario = int(valores["dia"])
 
         fecha_solicitada = datetime(today.year, mes_usuario, dia_usuario)
+        if fecha_solicitada < today:
+            fecha_solicitada = fecha_solicitada + relativedelta(years=1)
 
     minutes = int(valores["minutes"] or 0)
-    hora = int(valores["hora"]) + (0 if valores["ampm"] == "am" else 12)
+    hora = int(valores["hora"]) + (0 if valores["period"] == "am" else 12)
 
     return datetime(
         fecha_solicitada.year,
