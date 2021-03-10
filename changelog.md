@@ -7,3 +7,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 - Enable configurations to take timezones
+- Update parsing engine to simpler regex
+- Add support for more input strings

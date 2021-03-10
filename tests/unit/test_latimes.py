@@ -15,10 +15,14 @@ from latimes.config import DEFAULT_VALUES, LatimesConfiguration
     [
         ("jueves 10 pm", datetime(2021, 2, 25, 22, 00)),
         ("viernes 10 am", datetime(2021, 2, 26, 10, 00)),
+        ("Viernes 10 am", datetime(2021, 2, 26, 10, 00)),
+        ("Sábado 10 am", datetime(2021, 2, 27, 10, 00)),
         ("domingo 8:30 am", datetime(2021, 2, 28, 8, 30)),
+        ("DoMiNGo 8:30 am", datetime(2021, 2, 28, 8, 30)),
         ("27 de febrero 5 pm", datetime(2021, 2, 27, 17, 00)),
         ("2 de marzo 9:30 pm", datetime(2021, 3, 2, 21, 30)),
         ("2 de marzo 9:01 pm", datetime(2021, 3, 2, 21, 1)),
+        ("2 marzo 9:01 pm", datetime(2021, 3, 2, 21, 1)),
     ],
 )
 def test_interpreta_cadena_tiempo(cadena_entrada, valor_esperado):
@@ -28,16 +32,18 @@ def test_interpreta_cadena_tiempo(cadena_entrada, valor_esperado):
     assert valor_esperado == valor_actual
 
 
-@freeze_time("2000-01-01")
+@freeze_time("1982-12-29")  # Wednesday
 @pytest.mark.parametrize(
     ["cadena_entrada", "valor_esperado"],
     [
-        ("lunes 10 pm", datetime(2000, 1, 3, 22, 00)),
-        ("martes 10 am", datetime(2000, 1, 4, 10, 00)),
-        ("jueves 8 am", datetime(2000, 1, 6, 8, 00)),
+        ("viernes 10 pm", datetime(1982, 12, 31, 22, 00)),
+        ("sábado 10 am", datetime(1983, 1, 1, 10, 00)),
+        ("Domingo 10 am", datetime(1983, 1, 2, 10, 00)),
+        ("1 de enero 10 am", datetime(1983, 1, 1, 10, 00)),
+        ("31 de diciembre 10 am", datetime(1982, 12, 31, 10, 00)),
     ],
 )
-def test_interpreta_cadena_tiempo_2000(cadena_entrada, valor_esperado):
+def test_interpreta_cadena_tiempo_end_of_year(cadena_entrada, valor_esperado):
 
     valor_actual = interpreta_cadena_tiempo(cadena_entrada)
 
