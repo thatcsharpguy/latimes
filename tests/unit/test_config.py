@@ -2,8 +2,14 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from pytz import timezone
 
-from latimes.config import DEFAULT_VALUES, LatimesConfiguration, load_config
+from latimes.config import (
+    DEFAULT_VALUES,
+    LatimesConfiguration,
+    LatimesOutputFormatting,
+    load_config,
+)
 
 
 @pytest.mark.parametrize("path", (None, Path("i-dont-exist.yml")))
@@ -111,3 +117,22 @@ convert_to:
 def test_load_config_from_file_fails_missing_key(broken_config_file):
     with pytest.raises(KeyError):
         load_config(broken_config_file)
+
+
+@pytest.mark.parametrize(
+    "starting_timezone", ["America/Mexico_City", timezone("America/Mexico_City")]
+)
+@pytest.mark.parametrize(
+    "convert_to", [["Chile:America/Santiago"], {"Chile": timezone("America/Santiago")}]
+)
+def test_load_can_create_from_different_types(starting_timezone, convert_to):
+    output_formatting = LatimesOutputFormatting("fmt", ", ", ", ", True)
+    expected = LatimesConfiguration(
+        timezone("America/Mexico_City"),
+        {"Chile": timezone("America/Santiago")},
+        output_formatting,
+    )
+
+    actual = LatimesConfiguration(starting_timezone, convert_to, output_formatting)
+
+    assert expected == actual

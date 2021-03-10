@@ -104,7 +104,7 @@ def test_transforma_zonas_horarias_no_default():
         ("Mexico", datetime(2021, 2, 22, 9, 0, tzinfo=timezone("America/Mexico_City"))),
     ]
     configuration = LatimesConfiguration(
-        "America/Bogota", ["Mexico:America/Mexico_City"], None
+        timezone("America/Bogota"), {"Mexico": timezone("America/Mexico_City")}, None
     )
 
     valor_retorno = transforma_zonas_horarias(hora_entrada, configuration)

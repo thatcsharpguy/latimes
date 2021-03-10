@@ -1,6 +1,6 @@
 import collections.abc
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import yaml
 from pytz import timezone
@@ -37,17 +37,23 @@ class LatimesOutputFormatting:
 class LatimesConfiguration:
     def __init__(
         self,
-        starting_timezone: str,
-        convert_to: List[str],
+        starting_timezone: Union[str, timezone],
+        convert_to: Union[Dict[str, timezone], List[str]],
         output_formatting: LatimesOutputFormatting,
     ):
         self.output_formatting = output_formatting
-        self.convert_to = {}
+        if isinstance(convert_to, collections.abc.Sequence):
+            self.convert_to = dict()
+            for content in convert_to:
+                label, _, tz = content.partition(":")
+                self.convert_to[label] = timezone(tz)
+        else:
+            self.convert_to = convert_to
 
-        for content in convert_to:
-            label, _, tz = content.partition(":")
-            self.convert_to[label] = timezone(tz)
-        self.starting_timezone = timezone(starting_timezone)
+        if isinstance(starting_timezone, str):
+            self.starting_timezone = timezone(starting_timezone)
+        else:
+            self.starting_timezone = starting_timezone
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, LatimesConfiguration):
@@ -64,9 +70,16 @@ class LatimesConfiguration:
         output_format = LatimesOutputFormatting.from_dict(
             dictionary["output_formatting"]
         )
+
+        convert_to = dict()
+        for content in dictionary["convert_to"]:
+            label, _, tz = content.partition(":")
+            convert_to[label] = timezone(tz)
+        starting_timezone = timezone(dictionary["starting_timezone"])
+
         return cls(
-            starting_timezone=dictionary["starting_timezone"],
-            convert_to=dictionary["convert_to"],
+            starting_timezone=starting_timezone,
+            convert_to=convert_to,
             output_formatting=output_format,
         )
 
