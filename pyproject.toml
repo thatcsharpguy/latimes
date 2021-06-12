@@ -10,12 +10,13 @@ latimes = 'latimes.__main__:main'
 latime = 'latimes.__main__:main'
 
 [tool.poetry.dependencies]
+PyYAML = "^5.4.1"
+Unidecode = "^1.2.0"
 click = "^7.1.2"
 pyperclip = "^1.8.2"
 python = "^3.6"
+python-dateutil = "^2.8.1"
 pytz = "^2021.1"
-PyYAML = "^5.4.1"
-Unidecode = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
