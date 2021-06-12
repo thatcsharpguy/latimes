@@ -46,6 +46,9 @@ MESES = {
         ]
     )
 }
+MESES["septiembre"] = 9
+MESES["otubre"] = 10
+
 DIA_DOMINGO = 6
 
 
