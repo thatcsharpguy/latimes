@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List
 
 import click
+import pyperclip
 
 from latimes.config import load_config, write_config
 from latimes.exceptions import InvalidTimeStringException
@@ -13,8 +14,11 @@ from latimes.latimes import convert_times
 @click.argument("time_string", nargs=-1, type=click.STRING)
 @click.option("--config", default=None, type=click.Path(dir_okay=False))
 @click.option("--create-config/--no-create-config", default=False)
+@click.option("--copy/--no-copy", "-c", default=False)
 @click.option("-v", "--verbose", count=True)
-def main(time_string: List[str], config: str, create_config: bool, verbose: int):
+def main(
+    time_string: List[str], config: str, create_config: bool, copy: bool, verbose: int
+):
     """
     TIME_STRING Este es tu tiempo en lenguaje natural
     """
@@ -47,6 +51,10 @@ def main(time_string: List[str], config: str, create_config: bool, verbose: int)
         raise click.Abort()
 
     print(result)
+
+    if copy:
+        pyperclip.copy(result)
+        print("Copied to the clipboard!")
 
 
 def setup_logging(verbose):
