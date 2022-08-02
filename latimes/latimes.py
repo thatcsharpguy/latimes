@@ -2,12 +2,13 @@ import logging
 import re
 from collections import defaultdict, namedtuple
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from dateutil.relativedelta import relativedelta
 from unidecode import unidecode
 
-from latimes.config import LatimesConfiguration, LatimesOutputFormatting
+from latimes.utils.latimes_output_formatting import LatimesOutputFormatting
+from latimes.utils.latimes_configuration import DEFAULT_CONFIG, LatimesConfiguration
 from latimes.exceptions import InvalidTimeStringException
 
 TIME_REGEX_PORTION = (
@@ -52,7 +53,9 @@ MESES["otubre"] = 10
 DIA_DOMINGO = 6
 
 
-def convert_times(cadena_tiempo: str, configuration: LatimesConfiguration) -> str:
+def convert_times(cadena_tiempo: str, configuration: Optional[LatimesConfiguration] = None) -> str:
+    configuration = configuration or DEFAULT_CONFIG
+
     try:
         tiempo_usuario = interpreta_cadena_tiempo(cadena_tiempo)
     except ValueError as value_error:

@@ -6,7 +6,8 @@ from freezegun import freeze_time
 from pytz import timezone
 
 from latimes import interpreta_cadena_tiempo, transforma_zonas_horarias
-from latimes.config import DEFAULT_VALUES, LatimesConfiguration
+from latimes.utils import DEFAULT_VALUES
+from latimes.utils.latimes_configuration import LatimesConfiguration
 
 
 @freeze_time("2021-02-22")

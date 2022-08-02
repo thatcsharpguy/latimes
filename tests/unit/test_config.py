@@ -5,11 +5,11 @@ import pytest
 from pytz import timezone
 
 from latimes.config import (
-    DEFAULT_VALUES,
-    LatimesConfiguration,
-    LatimesOutputFormatting,
     load_config,
 )
+from latimes.utils import DEFAULT_VALUES
+from latimes.utils.latimes_output_formatting import LatimesOutputFormatting
+from latimes.utils.latimes_configuration import LatimesConfiguration
 
 
 @pytest.mark.parametrize("path", (None, Path("i-dont-exist.yml")))
